@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour {
 
     public float speed = 5.0f;
-    public float minJumpHeight = 2.5f;
-    public float maxJumpHeight = 5.0f;
+    public float minJumpVelocity = 2.5f;
+    public float maxJumpVelocity = 5.0f;
     
     public int maxJumpCount = 2;
     
@@ -15,11 +15,13 @@ public class PlayerMovement : MonoBehaviour {
     private bool jumpCancel = false;
     private bool isGrounded = false;
     private int jumpCount = 2;
-    private bool facingRight = true;
+    [HideInInspector]
+    public static SpriteRenderer sprite;
 
     void Start () {
         rigid = GetComponent<Rigidbody2D>();
         jumpCount = maxJumpCount;
+        sprite = GetComponentInChildren<SpriteRenderer>();
 	}
 	
 	void Update () {
@@ -34,7 +36,16 @@ public class PlayerMovement : MonoBehaviour {
     private void _MoveInput()
     {
         float horizontal = Input.GetAxis("Horizontal");
+        sprite.flipX = _FlipFace(horizontal);
         rigid.velocity = new Vector2(horizontal * speed, rigid.velocity.y);
+    }
+    private bool _FlipFace(float horizontal)
+    {
+        if (horizontal > 0)
+            return false;
+        if (horizontal == 0)
+            return sprite.flipX;
+        return true;
     }
     private void _JumpInputCheck()
     {
@@ -50,7 +61,7 @@ public class PlayerMovement : MonoBehaviour {
             if (jumpCount > 0)
             {
                 rigid.velocity = new Vector2(rigid.velocity.x, 0);
-                rigid.velocity += new Vector2(0, maxJumpHeight);
+                rigid.velocity += new Vector2(0, maxJumpVelocity);
                 jumpCount--;
             }
             if (_isGrounded())
@@ -60,10 +71,10 @@ public class PlayerMovement : MonoBehaviour {
             jumpCount = maxJumpCount;
         if (jumpCancel)
         {
-            if(rigid.velocity.y > minJumpHeight)
+            if(rigid.velocity.y > minJumpVelocity)
             {
                 rigid.velocity = new Vector2(rigid.velocity.x, 0);
-                rigid.velocity += new Vector2(0, minJumpHeight);
+                rigid.velocity += new Vector2(0, minJumpVelocity);
             }
             jumpCancel = false;
         }

@@ -8,22 +8,32 @@ public class PlayerShoot : MonoBehaviour
     public float burstFireRate = .1f;
     public float fireRate = .5f;
     public int burstClipCount = 3;
+    static public int bulletsOnScreen = 0;
+    static public int maxBulletsOnScreen = 4;
 
     private float lastFireTime = 0;
-
     private Vector3 offset;
+    private Vector3 initOffset;
+    private SpriteRenderer sprite;
+
     void Start()
     {
         float height = gameObject.GetComponentInChildren<SpriteRenderer>().bounds.size.y;
-        offset = new Vector3(0,0);
+        sprite = PlayerMovement.sprite;
+        offset = new Vector3(sprite.bounds.size.x / 2 + 0.2f, -0.075f);
+        initOffset = offset;
     }
 
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (sprite.flipX == true)
+            offset.x = -(sprite.bounds.size.x / 2 + 0.2f);
+        else
+            offset = initOffset;
+        if (Input.GetButtonDown("Fire1"))
         {
-            if (Time.time > lastFireTime)
+            if (Time.time > lastFireTime && bulletsOnScreen < maxBulletsOnScreen)
             {
                 lastFireTime = Time.time + fireRate;
                 StartCoroutine(_ShootBullet());
@@ -36,6 +46,7 @@ public class PlayerShoot : MonoBehaviour
         for (int i = 0; i < burstClipCount; i++)
         {
             BetterPool.Spawn(bulletPrefab, transform.position + offset);
+            bulletsOnScreen++;
             yield return new WaitForSeconds(burstFireRate);
         }
     }
