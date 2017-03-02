@@ -10,11 +10,15 @@ public class PlayerBullet : MonoBehaviour, ISpawnable
     protected float damage = 5f;
 
     private int facing = 1;
-    
+    void Start()
+    {
+        gameObject.transform.Rotate(new Vector3(0, 0, 90));
+    }
     void OnCollisionEnter2D(Collision2D other)
     {
-
-        Health targetHealth = other.transform.root.GetComponent<Health>();
+        Health targetHealth = null;
+        if(other.collider.gameObject.CompareTag("Enemy"))
+            targetHealth = other.transform.root.GetComponentInChildren<Health>();
         if (targetHealth != null)
         {
             targetHealth.Damage(damage);

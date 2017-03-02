@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Health))]
-public class Death : MonoBehaviour {
+public class PlayerDeath : MonoBehaviour
+{
     Health health;
     SpriteRenderer sprite;
     bool spriteDisable = false;
@@ -19,6 +20,7 @@ public class Death : MonoBehaviour {
     private void Health_onDamage(float amount)
     {
         Debug.Log("Health: " + health.healthPercent);
+        Camera.main.transform.GetComponent<ScreenShake>().screenShake(Mathf.Max(amount/100f,.05f), Mathf.Max(amount/50f,0.25f));
         StartCoroutine(_DamageFlash());
     }
     private IEnumerator _DamageFlash()
